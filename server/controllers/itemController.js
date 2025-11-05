@@ -18,7 +18,7 @@ exports.createItem = async (req, res) => {
     const item = await Item.create({
       title,
       description,
-      owner: req.user.id, // use .id (from decoded JWT)
+      owner: req.user.id, 
     });
 
     res.status(201).json(item);
