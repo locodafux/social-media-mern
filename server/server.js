@@ -10,7 +10,10 @@ const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 connectDB();
@@ -19,8 +22,8 @@ app.get('/', (req, res) => {
   res.json({ message: 'Express MVC API running' });
 });
 
-app.use('/auth', authRoutes);
-app.use('/items', itemRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/items', itemRoutes);
 
 const PORT = process.env.PORT || 4000;
 

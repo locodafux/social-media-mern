@@ -18,8 +18,8 @@ export default function Register() {
 
    async function registerUser(e) {
         e.preventDefault();
-        const res = await fetch('/auth/register', {
-            method: 'post',
+        const res = await fetch('/api/auth/register', {
+            method: 'POST',
             body: JSON.stringify(form),
         });
 
