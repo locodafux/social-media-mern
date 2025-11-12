@@ -53,7 +53,7 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#060f20] to-[#091427]">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-[#060f20] to-[#091427]">
       <div className="bg-[#0b1220] border border-white/5 shadow-2xl rounded-2xl w-full max-w-md p-10 flex flex-col gap-5">
         <h1 className="text-center text-2xl font-bold text-white">
           Create Account
