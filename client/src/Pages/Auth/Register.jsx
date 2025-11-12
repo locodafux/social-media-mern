@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-
 export default function Register() {
   const [form, setForm] = useState({
     name: "",
@@ -14,25 +13,44 @@ export default function Register() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
+    // Clear error for that field while typing
+    if (errors[e.target.id]) {
+      setErrors({ ...errors, [e.target.id]: "" });
+    }
   };
 
-   async function registerUser(e) {
-        e.preventDefault();
-        const res = await fetch('/api/auth/register', {
-            method: 'POST',
-            body: JSON.stringify(form),
-        });
+  async function registerUser(e) {
+    e.preventDefault();
 
-        const data = await res.json();
-        
-        if (data.errors) {
-            setErrors(data.errors)
-        } else {
-            localStorage.setItem('token', data.token);
-            setToken(data.token);
-            navigate("/");
-        }
+    // ✅ Client-side validation for password confirmation
+    if (form.password !== form.password_confirmation) {
+      setErrors({
+        ...errors,
+        password_confirmation: "Passwords do not match",
+      });
+      return;
     }
+
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (data.errors) {
+      const formattedErrors = {};
+      data.errors.forEach((err) => {
+        formattedErrors[err.path] = err.msg;
+      });
+      setErrors(formattedErrors);
+    } else {
+      localStorage.setItem("token", data.token);
+      setErrors({});
+      // navigate("/");
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#060f20] to-[#091427]">
@@ -45,6 +63,7 @@ export default function Register() {
         </p>
 
         <form onSubmit={registerUser} className="flex flex-col gap-4">
+          {/* Full Name */}
           <div>
             <label
               htmlFor="name"
@@ -58,11 +77,20 @@ export default function Register() {
               placeholder="Enter your full name"
               value={form.name}
               onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-transparent border border-white/10 text-white text-sm focus:border-blue-500 outline-none transition"
+              className={`w-full p-3 rounded-lg bg-transparent border text-white text-sm focus:border-blue-500 outline-none transition ${
+                errors.name
+                  ? "border-red-400 bg-red-400/10 placeholder-red-300"
+                  : "border-white/10"
+              }`}
             />
+            {errors.name && (
+              <p className="mt-2 text-sm text-red-400">
+                <span className="font-medium">Heads up:</span> {errors.name}
+              </p>
+            )}
           </div>
 
+          {/* Email */}
           <div>
             <label
               htmlFor="email"
@@ -76,11 +104,20 @@ export default function Register() {
               placeholder="Enter your email"
               value={form.email}
               onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-transparent border border-white/10 text-white text-sm focus:border-blue-500 outline-none transition"
+              className={`w-full p-3 rounded-lg bg-transparent border text-white text-sm focus:border-blue-500 outline-none transition ${
+                errors.email
+                  ? "border-red-400 bg-red-400/10 placeholder-red-300"
+                  : "border-white/10"
+              }`}
             />
+            {errors.email && (
+              <p className="mt-2 text-sm text-red-400">
+                <span className="font-medium">Heads up:</span> {errors.email}
+              </p>
+            )}
           </div>
 
+          {/* Password */}
           <div>
             <label
               htmlFor="password"
@@ -94,11 +131,20 @@ export default function Register() {
               placeholder="Create a password"
               value={form.password}
               onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-transparent border border-white/10 text-white text-sm focus:border-blue-500 outline-none transition"
+              className={`w-full p-3 rounded-lg bg-transparent border text-white text-sm focus:border-blue-500 outline-none transition ${
+                errors.password
+                  ? "border-red-400 bg-red-400/10 placeholder-red-300"
+                  : "border-white/10"
+              }`}
             />
+            {errors.password && (
+              <p className="mt-2 text-sm text-red-400">
+                <span className="font-medium">Heads up:</span> {errors.password}
+              </p>
+            )}
           </div>
 
+          {/* Confirm Password */}
           <div>
             <label
               htmlFor="password_confirmation"
@@ -112,9 +158,18 @@ export default function Register() {
               placeholder="Re-enter your password"
               value={form.password_confirmation}
               onChange={handleChange}
-              required
-              className="w-full p-3 rounded-lg bg-transparent border border-white/10 text-white text-sm focus:border-blue-500 outline-none transition"
+              className={`w-full p-3 rounded-lg bg-transparent border text-white text-sm focus:border-blue-500 outline-none transition ${
+                errors.password_confirmation
+                  ? "border-red-400 bg-red-400/10 placeholder-red-300"
+                  : "border-white/10"
+              }`}
             />
+            {errors.password_confirmation && (
+              <p className="mt-2 text-sm text-red-400">
+                <span className="font-medium">Heads up:</span>{" "}
+                {errors.password_confirmation}
+              </p>
+            )}
           </div>
 
           <button
@@ -129,9 +184,9 @@ export default function Register() {
           Already have an account?{" "}
           <Link
             to="/login"
-            className="text-blue-500 font-semibold hover:underline"
+            className="text-blue-400 font-semibold hover:underline"
           >
-           Sign in
+            Sign in
           </Link>
         </div>
       </div>
