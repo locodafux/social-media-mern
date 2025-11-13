@@ -12,6 +12,10 @@ export default function Settings() {
     alert("✅ Your settings have been saved successfully!");
   };
 
+  function logout() {
+    alert("logout");
+  }
+
   return (
     <div
       className="min-h-screen flex flex-col items-center  text-gray-100 font-inter transition-colors duration-300"
@@ -79,8 +83,14 @@ export default function Settings() {
         </section>
 
         {/* Save Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-x-2">
           <button
+            onClick={logout}
+            className="bg-gray-500 hover:bg-gray-600 transition text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg"
+          >
+            Logout
+          </button>
+            <button
             onClick={saveSettings}
             className="bg-blue-500 hover:bg-blue-600 transition text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg"
           >

@@ -46,7 +46,6 @@ exports.login = async (req, res) => {
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
 
     const token = generateToken(user);
-    console.log("JWT Secret used in generateToken:", process.env.JWT_SECRET);
     res.json({
       token,
       user: { id: user._id, name: user.name, email: user.email },

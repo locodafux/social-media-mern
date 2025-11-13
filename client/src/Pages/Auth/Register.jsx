@@ -13,9 +13,16 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
 
+  // ✅ Utility to show toast reliably
+  const showToast = (message, type) => {
+    setToast(null); // reset first to force re-render
+    setTimeout(() => {
+      setToast({ message, type });
+    }, 50);
+  };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
-    // Clear error for that field while typing
     if (errors[e.target.id]) {
       setErrors({ ...errors, [e.target.id]: "" });
     }
@@ -24,67 +31,67 @@ export default function Register() {
   async function registerUser(e) {
     e.preventDefault();
 
-    // ✅ Client-side validation for password confirmation
     if (form.password !== form.password_confirmation) {
       setErrors({
         ...errors,
         password_confirmation: "Passwords do not match",
       });
+      showToast("Passwords do not match!", "error");
       return;
     }
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    const data = await res.json();
-
-    if (data.errors) {
-      const formattedErrors = {};
-      data.errors.forEach((err) => {
-        formattedErrors[err.path] = err.msg;
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
-      setErrors(formattedErrors);
-       setToast({ message: "Registration failed!", type: "error" });
-    } else {
-      localStorage.setItem("token", data.token);
-       setToast({ message: "Account created successfully!", type: "success" });
-      setErrors({});
-      clearForm();
-      navigate("/");
+
+      const data = await res.json();
+
+      if (data.errors) {
+        const formattedErrors = {};
+        data.errors.forEach((err) => {
+          formattedErrors[err.path] = err.msg;
+        });
+        setErrors(formattedErrors);
+        showToast("Registration failed!", "error");
+      } else {
+        localStorage.setItem("token", data.token);
+        showToast("Account created successfully!", "success");
+        setErrors({});
+        clearForm();
+
+        // Wait for toast to display before navigating
+         navigate("/");
+      }
+    } catch (err) {
+      showToast("Server error. Please try again.", "error");
     }
   }
 
   function clearForm() {
-     setForm({ 
-        name: "",
-        email: "",
-        password: "",
-        password_confirmation: ""
-      });
+    setForm({
+      name: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+    });
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-[#060f20] to-[#091427]">
-        {toast && <ToastComponent message={toast.message} type={toast.type} />}
+      {toast && <ToastComponent message={toast.message} type={toast.type} />}
       <div className="bg-[#0b1220] border border-white/5 shadow-2xl rounded-2xl w-full max-w-md p-10 flex flex-col gap-5">
-        <h1 className="text-center text-2xl font-bold text-white">
-          Create Account
-        </h1>
+        <h1 className="text-center text-2xl font-bold text-white">Create Account</h1>
         <p className="text-center text-sm text-[#98a0b3]">
           Join Connect and start building your professional network
         </p>
-        
 
         <form onSubmit={registerUser} className="flex flex-col gap-4">
-          {/* Full Name */}
+          {/* Name */}
           <div>
-            <label
-              htmlFor="name"
-              className="block mb-2 text-sm font-semibold text-white"
-            >
+            <label htmlFor="name" className="block mb-2 text-sm font-semibold text-white">
               Full Name
             </label>
             <input
@@ -108,10 +115,7 @@ export default function Register() {
 
           {/* Email */}
           <div>
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-semibold text-white"
-            >
+            <label htmlFor="email" className="block mb-2 text-sm font-semibold text-white">
               Email
             </label>
             <input
@@ -135,10 +139,7 @@ export default function Register() {
 
           {/* Password */}
           <div>
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-semibold text-white"
-            >
+            <label htmlFor="password" className="block mb-2 text-sm font-semibold text-white">
               Password
             </label>
             <input
@@ -198,10 +199,7 @@ export default function Register() {
 
         <div className="text-center text-sm mt-3 text-[#98a0b3]">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-blue-400 font-semibold hover:underline"
-          >
+          <Link to="/login" className="text-blue-400 font-semibold hover:underline">
             Sign in
           </Link>
         </div>
