@@ -8,6 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 app.use(cors({
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/user', userRoutes);
 
 const PORT = process.env.PORT || 4000;
 

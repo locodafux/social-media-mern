@@ -3,31 +3,42 @@ import { createContext, useEffect, useState } from "react";
 export const AppContext = createContext();
 
 export default function AppProvider({ children }) {
-    // const [token, setToken] = useState(localStorage.getItem('token'));
-    const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
 
-    // async function getUser() {
-    //     const res = await fetch("/api/user", {
-    //         headers: {
-    //             Authorization: `Bearer ${token}`
-    //         }
-    //     });
+  // Fetch logged-in user info (optional)
+  async function getUser() {
+    try {
+      const res = await fetch("/api/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    //     const data = await res.json();
+      const data = await res.json();
 
-    //     if (res.ok) {
-    //         setUser(data);
-    //     }
-    // }
+      if (res.ok) {
+        setUser(data);
+      } else {
+        console.error("Failed to fetch user:", data);
+      }
+    } catch (err) {
+      console.error("Error fetching user:", err);
+    }
+  }
 
-    // useEffect(() => {
-    //     if (token) {
-    //         getUser();
-    //     }
-    // }, [token]);
-    return (
-        <AppContext.Provider value={{ token, setToken, user, setUser }}>
-            {children}
-        </AppContext.Provider>
-    );
+  // Fetch user when token changes
+  useEffect(() => {
+    if (token) {
+      getUser();
+    } else {
+      setUser(null); // clear user when token is removed
+    }
+  }, [token]);
+
+  return (
+    <AppContext.Provider value={{ token, setToken, user, setUser }}>
+      {children}
+    </AppContext.Provider>
+  );
 }

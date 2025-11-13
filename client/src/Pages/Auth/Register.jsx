@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { ToastComponent } from "@/Components/Toast";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -8,8 +9,9 @@ export default function Register() {
     password: "",
     password_confirmation: "",
   });
-
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
@@ -45,15 +47,28 @@ export default function Register() {
         formattedErrors[err.path] = err.msg;
       });
       setErrors(formattedErrors);
+       setToast({ message: "Registration failed!", type: "error" });
     } else {
       localStorage.setItem("token", data.token);
+       setToast({ message: "Account created successfully!", type: "success" });
       setErrors({});
-      // navigate("/");
+      clearForm();
+      navigate("/");
     }
+  }
+
+  function clearForm() {
+     setForm({ 
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: ""
+      });
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-[#060f20] to-[#091427]">
+        {toast && <ToastComponent message={toast.message} type={toast.type} />}
       <div className="bg-[#0b1220] border border-white/5 shadow-2xl rounded-2xl w-full max-w-md p-10 flex flex-col gap-5">
         <h1 className="text-center text-2xl font-bold text-white">
           Create Account
@@ -61,6 +76,7 @@ export default function Register() {
         <p className="text-center text-sm text-[#98a0b3]">
           Join Connect and start building your professional network
         </p>
+        
 
         <form onSubmit={registerUser} className="flex flex-col gap-4">
           {/* Full Name */}
