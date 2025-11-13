@@ -1,15 +1,28 @@
 import { Modal, Button } from "flowbite-react";
 import { useState } from "react";
-import { Image, Smile, Globe, X } from "lucide-react";
+import { Image, Smile, Users, X, Trash2 } from "lucide-react";
 
 export function PostModal({ openModal, setOpenModal }) {
   const [postContent, setPostContent] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handlePost = () => {
-    if (!postContent.trim()) return;
-    console.log("Post created:", postContent);
+    if (!postContent.trim() && !selectedImage) return;
+    console.log("Post created:", { postContent, selectedImage });
     setPostContent("");
+    setSelectedImage(null);
     setOpenModal(false);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
   };
 
   return (
@@ -18,43 +31,38 @@ export function PostModal({ openModal, setOpenModal }) {
       size="lg"
       onClose={() => setOpenModal(false)}
       popup
-      // 1. **FIX:** Override the default Flowbite Modal theme for a polished dark mode look
       theme={{
-        // Targets the modal's root container/backdrop
         root: {
           base: "fixed inset-0 z-50 overflow-y-auto overflow-x-hidden",
           show: {
-            // Apply the desired backdrop blur effect
             on: "bg-gray-900/50 backdrop-blur-md dark:bg-gray-900/80",
             off: "hidden",
           },
         },
-        // Targets the modal's content area (where the rounded-box is)
         content: {
           base: "relative h-full w-full p-4 md:h-auto",
-          inner: "relative flex h-full flex-col rounded-2xl bg-[#0f172a] shadow-2xl border border-white/10 overflow-hidden outline-none dark:bg-gray-800",
+          inner:
+            "relative flex h-full flex-col rounded-2xl bg-[#0f172a] shadow-2xl border border-white/10 overflow-hidden outline-none dark:bg-gray-800",
         },
-        // Targets the main wrapper around the content
         body: {
-            base: "p-0 flex-1 overflow-auto", // Changed p-6 to p-0 as the body content will handle the padding
-        }
+          base: "p-0 flex-1 overflow-auto",
+        },
       }}
     >
-      {/* 2. **CHANGE:** Removed border, shadow, and background classes from this div, as they are now in the theme prop */}
-      <div className="text-[#e2e8f0]"> 
+      <div className="text-[#e2e8f0]">
         {/* HEADER */}
         <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center">
           <h3 className="font-semibold text-lg tracking-wide">Create Post</h3>
           <button
             onClick={() => setOpenModal(false)}
-            className="text-gray-400 hover:text-gray-100 transition-colors"
+            className="text-gray-400 hover:text-gray-100 transition-colors focus:ring-0 focus:border-transparent"
           >
             <X size={22} />
           </button>
         </div>
 
         {/* BODY */}
-        <div className="p-6"> {/* Added p-6 here for internal padding */}
+        <div className="p-6">
           {/* User info */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-500 to-teal-400 flex items-center justify-center font-semibold text-white shadow-md">
@@ -65,8 +73,8 @@ export function PostModal({ openModal, setOpenModal }) {
                 Leonardo Timkang Jr.
               </p>
               <div className="flex items-center gap-1 text-sm text-gray-400">
-                <Globe size={14} />
-                <span>Public</span>
+                <Users size={14} />
+                <span>Friends</span>
               </div>
             </div>
           </div>
@@ -80,19 +88,46 @@ export function PostModal({ openModal, setOpenModal }) {
             className="w-full bg-transparent text-[#e2e8f0] placeholder-gray-500 border-none focus:ring-0 resize-none outline-none text-[15px] leading-relaxed"
           />
 
+          {/* Image Preview */}
+          {selectedImage && (
+            <div className="relative mt-4 rounded-xl overflow-hidden border border-white/10">
+              <img
+                src={selectedImage}
+                alt="Uploaded"
+                className="w-full h-64 object-cover"
+              />
+              <button
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition-colors"
+                title="Remove image"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
+
           {/* Divider */}
           <div className="border-t border-white/10 my-4" />
 
           {/* Footer */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 text-gray-400">
-              <button
-                type="button"
-                className="hover:text-blue-400 transition-colors"
+              {/* Image Upload */}
+              <label
+                htmlFor="image-upload"
+                className="hover:text-blue-400 transition-colors cursor-pointer flex items-center gap-1"
                 title="Add image"
               >
                 <Image size={20} />
-              </button>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </label>
+
               <button
                 type="button"
                 className="hover:text-yellow-400 transition-colors"
@@ -104,9 +139,9 @@ export function PostModal({ openModal, setOpenModal }) {
 
             <Button
               onClick={handlePost}
-              disabled={!postContent.trim()}
+              disabled={!postContent.trim() && !selectedImage}
               className={`font-semibold px-5 py-2 rounded-lg transition-all ${
-                postContent.trim()
+                postContent.trim() || selectedImage
                   ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:opacity-90"
                   : "bg-gray-700 text-gray-400 cursor-not-allowed"
               }`}

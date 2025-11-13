@@ -55,10 +55,10 @@ export default function Home() {
         <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-400 to-teal-400 flex items-center justify-center font-semibold">
           L
         </div>
-        <input
+       <input
           type="text"
           placeholder="What's on your mind?"
-          className="flex-1 bg-transparent outline-none text-[#e6eef8] placeholder-[#98a0b3] pointer-events-none"
+          className="flex-1 bg-transparent outline-none text-[#e6eef8] placeholder-[#98a0b3] pointer-events-none border-none focus:ring-0 focus:border-transparent"
           readOnly
         />
       </div>
