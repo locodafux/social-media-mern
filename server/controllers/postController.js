@@ -1,34 +1,35 @@
 const { validationResult } = require('express-validator');
 const Post = require('../models/Post');
 
-// Create new post
 exports.createPost = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
-
   try {
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: 'Unauthorized: No user data found' });
-    }
+    console.log("req.body:", req.body); // should log { content: "..." }
+    console.log("req.file:", req.file); // file info if uploaded
 
-    const { content, image } = req.body; 
-    // image is optional; you can add Cloudinary URL after upload
+    if (!req.user || !req.user.id)
+      return res.status(401).json({ message: 'Unauthorized' });
+
+    const content = req.body.content;
+    if (!content || !content.trim())
+      return res.status(400).json({ message: 'Post content cannot be empty' });
+
+    let imageUrl = req.file ? req.file.originalname : null; // store filename for now
 
     const post = await Post.create({
-      content,
-      image: image || null,
+      content: content.trim(),
+      image: imageUrl,
       owner: req.user.id,
     });
 
     res.status(201).json(post);
   } catch (err) {
-    console.error('[ERROR] createPost:', err.message);
+    console.error('[ERROR] createPost:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// Get all posts for logged-in user
+
+// GET all posts for logged-in user
 exports.getPosts = async (req, res) => {
   try {
     if (!req.user?.id)
@@ -42,7 +43,7 @@ exports.getPosts = async (req, res) => {
   }
 };
 
-// Get single post
+// GET single post
 exports.getPost = async (req, res) => {
   try {
     const post = await Post.findOne({ _id: req.params.id, owner: req.user.id });
@@ -54,14 +55,18 @@ exports.getPost = async (req, res) => {
   }
 };
 
-// Update post
+// UPDATE post (text-only)
 exports.updatePost = async (req, res) => {
   try {
-    const updates = (({ content, image }) => ({ content, image }))(req.body);
+    const { content } = req.body;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({ message: 'Post content cannot be empty' });
+    }
 
     const post = await Post.findOneAndUpdate(
       { _id: req.params.id, owner: req.user.id },
-      { $set: updates },
+      { $set: { content: content.trim() } },
       { new: true, runValidators: true }
     );
 
@@ -75,7 +80,7 @@ exports.updatePost = async (req, res) => {
   }
 };
 
-// Delete post
+// DELETE post
 exports.deletePost = async (req, res) => {
   try {
     const post = await Post.findOneAndDelete({ _id: req.params.id, owner: req.user.id });

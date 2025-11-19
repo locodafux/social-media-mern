@@ -12,11 +12,19 @@ const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
 
 const app = express();
+
 app.use(cors({
   origin: 'http://localhost:5173',
-  credentials: true
+  credentials: true,
 }));
-app.use(express.json());
+
+// Only parse JSON for routes that expect JSON
+app.use('/api/auth', express.json(), authRoutes);
+app.use('/api/items', express.json(), itemRoutes);
+app.use('/api/user', express.json(), userRoutes);
+
+// Post routes handle FormData via Multer, so no express.json here
+app.use('/api/posts', postRoutes);
 
 connectDB();
 
@@ -24,12 +32,5 @@ app.get('/', (req, res) => {
   res.json({ message: 'Express MVC API running' });
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/items', itemRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/user', userRoutes);
-
 const PORT = process.env.PORT || 4000;
-
 app.listen(PORT, 'localhost', () => console.log(`✅ Server running on http://localhost:${PORT}`));
-
