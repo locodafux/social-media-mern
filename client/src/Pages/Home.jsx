@@ -1,50 +1,61 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useContext } from "react";
 import { PlusCircle } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 import { PostModal } from "@/Components/PostModal";
+import {AppContext} from "@/Context/AppContext";
 
 export default function Home() {
   const { query, loading } = useOutletContext();
-  const [openModal, setOpenModal] = useState(false); // ⬅️ modal state
+  const [openModal, setOpenModal] = useState(false); 
+  const [data, setData] = useState([]);
+  const { token } = useContext(AppContext);
+  const getData = async () => {
+    const url = "api/posts";
+	  try {
+      const res = await fetch(url,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+      throw new Error(`Response status: ${res.status}`);
+    }
+    const data = await res.json()
+    setData(data);
+    console.log(data)
+	  } catch (error){
+	      console.log("Error fetching data:", error);
+	  }
+  }
 
-  const posts = [
-    {
-      id: 1,
-      author: "Anne Cortez",
-      role: "Senior Dev • Tech · Remote",
-      time: "2h",
-      content:
-        "Excited to share our team's latest achievements: we cut build time by 40% and launched canary releases.",
-      img: "https://via.placeholder.com/1200x600/10252b/e6eef8?text=Project+Snapshot",
-    },
-    {
-      id: 2,
-      author: "Khaled Omar",
-      role: "Data Scientist • FinTech",
-      time: "1d",
-      content:
-        "On the importance of solid data contracts across teams. Agreements on schemas make rollouts smoother.",
-    },
-    {
-      id: 3,
-      author: "Leonardo Wilcon",
-      role: "Product Designer • Manila",
-      time: "3d",
-      content: "Just finished prototyping a new collaboration dashboard for teams 🚀",
-    },
-  ];
+  useEffect(() => {
+    getData();
+  }, []);
 
+   const posts = useMemo(
+    () =>
+      data.map((p) => ({
+        id: p._id,
+        author: p.owner?.name || "Unknown User",
+        role: p.owner?.role || "Member",
+        time: new Date(p.createdAt).toLocaleDateString(),
+        content: p.content,
+        img: p.imageUrl,
+      })),
+    [data]
+  );
+
+  // Filter posts based on search query
   const filteredPosts = useMemo(() => {
     if (!query?.trim()) return posts;
     const lower = query.toLowerCase();
     return posts.filter(
       (p) =>
-        p.author.toLowerCase().includes(lower) ||
-        p.content.toLowerCase().includes(lower) ||
-        p.role.toLowerCase().includes(lower)
+        p.author?.toLowerCase().includes(lower) ||
+        p.content?.toLowerCase().includes(lower) ||
+        p.role?.toLowerCase().includes(lower)
     );
-  }, [query]);
-
+  }, [query, posts]);
   return (
     <div className="flex flex-col gap-4 max-w-5xl m-auto p-4">
       {/* ✏️ CREATE POST */}
@@ -64,7 +75,7 @@ export default function Home() {
       </div>
 
       {/* 🧠 POST MODAL */}
-      <PostModal openModal={openModal} setOpenModal={setOpenModal} />
+      <PostModal openModal={openModal} setOpenModal={setOpenModal} onPostCreated ={getData} />
 
       {/* 📰 FEED */}
       {loading ? (

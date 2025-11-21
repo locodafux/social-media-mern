@@ -1,20 +1,19 @@
   import { Modal, Button } from "flowbite-react";
   import { useState, useContext } from "react";
   import { Image, Smile, Users, X, Trash2 } from "lucide-react";
-  import { AppContext } from "@/Context/AppContext"; // ✅ adjust this path if needed
+  import { AppContext } from "@/Context/AppContext"; 
 
-  export function PostModal({ openModal, setOpenModal }) {
-    const { token, user } = useContext(AppContext); // ✅ get user + token globally
+  export function PostModal({ openModal, setOpenModal, onPostCreated }) {
+    const { token, user } = useContext(AppContext); 
     const [postContent, setPostContent] = useState("");
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedImageFile, setSelectedImageFile] = useState(null);
 
-    // Handle image upload
     const handleImageUpload = (e) => {
       const file = e.target.files[0];
       if (file) {
-        setSelectedImage(URL.createObjectURL(file)); // preview
-        setSelectedImageFile(file); // actual file
+        setSelectedImage(URL.createObjectURL(file)); 
+        setSelectedImageFile(file); 
       }
     };
 
@@ -50,9 +49,8 @@
           return;
         }
 
-        console.log("Post created:", data);
+        if(onPostCreated) onPostCreated();
 
-        // Reset modal fields
         setPostContent("");
         setSelectedImage(null);
         setSelectedImageFile(null);
@@ -102,7 +100,7 @@
           <div className="p-6">
             {/* USER INFO */}
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-500 to-teal-400 flex items-center justify-center font-semibold text-white shadow-md">
+              <div className="w-11 h-11 rounded-xl bg-linear-to-tr from-blue-500 to-teal-400 flex items-center justify-center font-semibold text-white shadow-md">
                 {user?.name?.charAt(0) || "?"}
               </div>
               <div>
@@ -178,7 +176,7 @@
                 disabled={!postContent.trim() && !selectedImage}
                 className={`font-semibold px-5 py-2 rounded-lg transition-all ${
                   postContent.trim() || selectedImage
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:opacity-90"
+                    ? "bg-linear-to-r from-blue-500 to-purple-600 text-white hover:opacity-90"
                     : "bg-gray-700 text-gray-400 cursor-not-allowed"
                 }`}
               >

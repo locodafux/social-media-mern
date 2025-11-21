@@ -29,19 +29,22 @@ exports.createPost = async (req, res) => {
 };
 
 
-// GET all posts for logged-in user
 exports.getPosts = async (req, res) => {
   try {
     if (!req.user?.id)
       return res.status(401).json({ message: 'Unauthorized' });
 
-    const posts = await Post.find({ owner: req.user.id }).sort({ createdAt: -1 });
+    const posts = await Post.find({ owner: req.user.id })
+      .sort({ createdAt: -1 })
+      .populate('owner', 'name'); // <-- populate owner and select only the "name" field
+
     res.json(posts);
   } catch (err) {
     console.error('[ERROR] getPosts:', err.message);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
 
 // GET single post
 exports.getPost = async (req, res) => {

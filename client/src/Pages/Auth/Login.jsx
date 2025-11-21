@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastComponent } from "@/Components/Toast";
-import { AppContext } from "@/Context/AppContext"; // 👈 import your context
+import { AppContext } from "@/Context/AppContext"; 
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,9 +10,8 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
 
-  const { setToken } = useContext(AppContext); // 👈 access context setter
+  const { setToken } = useContext(AppContext); 
 
-  // ✅ Always trigger toast even with the same message
   function showToast(message, type) {
     setToast(null);
     setTimeout(() => {
