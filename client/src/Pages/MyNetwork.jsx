@@ -49,8 +49,10 @@ export default function MyNetwork() {
         <div className="flex items-center gap-3">
         <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-teal-400 to-blue-400 flex items-center justify-center font-bold text-lg">LW</div>
         <div>
-        <div className="font-bold">{ userInfo?.name }</div>import 
-        <div className="text-sm text-gray-400">Product Designer • Manila</div>
+        <div className="font-bold">{ userInfo?.name }</div>
+        <div className="text-sm text-gray-400">
+            {`${userInfo?.job || "TBD"} • ${userInfo?.location?.city || "TBD"}`}
+        </div>
         </div>
         </div>
 
