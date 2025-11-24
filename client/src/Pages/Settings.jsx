@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AppContext } from "@/Context/AppContext";
 
 export default function Settings() {
   const [username, setUsername] = useState("Leonardo");
@@ -7,13 +9,17 @@ export default function Settings() {
   const [onlineStatus, setOnlineStatus] = useState(true);
   const [emailNotif, setEmailNotif] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const { setToken } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const saveSettings = () => {
     alert("✅ Your settings have been saved successfully!");
   };
 
   function logout() {
-    alert("logout");
+    localStorage.removeItem("token");
+    setToken(null);
+    navigate("/login");
   }
 
   return (
