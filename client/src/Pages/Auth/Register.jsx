@@ -5,6 +5,7 @@ import { ToastComponent } from "@/Components/Toast";
 export default function Register() {
   const [form, setForm] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
     password_confirmation: "",
@@ -109,6 +110,29 @@ export default function Register() {
             {errors.name && (
               <p className="mt-2 text-sm text-red-400">
                 <span className="font-medium">Heads up:</span> {errors.name}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="username" className="block mb-2 text-sm font-semibold text-white">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              placeholder="Enter your username"
+              value={form.username}
+              onChange={handleChange}
+              className={`w-full p-3 rounded-lg bg-transparent border text-white text-sm focus:border-blue-500 outline-none transition ${
+                errors.name
+                  ? "border-red-400 bg-red-400/10 placeholder-red-300"
+                  : "border-white/10"
+              }`}
+            />
+            {errors.username && (
+              <p className="mt-2 text-sm text-red-400">
+                <span className="font-medium">Heads up:</span> {errors.username}
               </p>
             )}
           </div>
