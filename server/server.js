@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
+const friendRoutes = require('./routes/friendRoutes');
 
 const app = express();
 
@@ -18,12 +19,10 @@ app.use(cors({
   credentials: true,
 }));
 
-// Only parse JSON for routes that expect JSON
 app.use('/api/auth', express.json(), authRoutes);
 app.use('/api/items', express.json(), itemRoutes);
 app.use('/api/user', express.json(), userRoutes);
-
-// Post routes handle FormData via Multer, so no express.json here
+app.use('/api/friends', express.json(), friendRoutes);
 app.use('/api/posts', postRoutes);
 
 connectDB();
